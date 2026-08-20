@@ -8,9 +8,6 @@ app = FastAPI(title="FastAPI Application", version="1.0.0")
 async def root():
     return {"message": "Welcome to FastAPI"}
 
-@app.get("/api/health")
-async def health_check():
-    return {"status": "healthy"}
 
 @app.get("/api/items/{item_id}")
 async def read_item(item_id: int):

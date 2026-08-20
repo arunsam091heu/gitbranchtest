@@ -6,14 +6,17 @@ from models import Item, User, ItemResponse
 from database import db
 from auth import verify_token, create_access_token
 from logger import app_logger
+import uvicorn
 
-app = FastAPI(title="FastAPI Demo API", version="1.0.0")
+app = FastAPI(title="FastAPI Application", version="1.0.0")
 
 @app.get("/")
-def read_root():
-    """Root endpoint"""
-    app_logger.info("Root endpoint accessed")
-    return {"message": "Welcome to FastAPI Demo API"}
+async def root():
+    return {"message": "Welcome to FastAPI"}
+
+@app.get("/api/health")
+async def health_check():
+    return {"status": "healthy"}
 
 @app.post("/items/", response_model=ItemResponse)
 def create_item(item: Item, token: dict = Depends(verify_token)):
@@ -25,6 +28,11 @@ def create_item(item: Item, token: dict = Depends(verify_token)):
         "data": item,
         "message": "Item created successfully"
     }
+
+@app.post("/api/items")
+async def create_item_simple(item_data: dict):
+    """Create item with simple data"""
+    return {"message": "Item created", "data": item_data}
 
 @app.get("/items/{item_id}")
 def get_item(item_id: int, token: dict = Depends(verify_token)):
@@ -67,3 +75,6 @@ def login(username: str, password: str):
         access_token = create_access_token(data={"sub": username})
         return {"access_token": access_token, "token_type": "bearer"}
     raise HTTPException(status_code=401, detail="Invalid credentials")
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -15,16 +15,6 @@ def read_root():
     app_logger.info("Root endpoint accessed")
     return {"message": "Welcome to FastAPI Demo API"}
 
-@app.post("/items/", response_model=ItemResponse)
-def create_item(item: Item, token: dict = Depends(verify_token)):
-    """Create a new item"""
-    app_logger.info(f"Creating item: {item.name}")
-    db.add_item(item.id, item.dict())
-    return {
-        "success": True,
-        "data": item,
-        "message": "Item created successfully"
-    }
 
 @app.get("/items/{item_id}")
 def get_item(item_id: int, token: dict = Depends(verify_token)):

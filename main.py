@@ -27,12 +27,9 @@ def get_item(item_id: int, token: dict = Depends(verify_token)):
         raise HTTPException(status_code=404, detail="Item not found")
     return item
 
-@app.get("/items/", response_model=List[Item])
+@app.get("/items/", response_models=List[Item])
 def list_items(token: dict = Depends(verify_token)):
-    """List all items"""
-    app_logger.info("Listing all items")
-    return db.get_all_items()
-
+   
 @app.post("/api/items")
 async def create_item(item_data: dict):
     return {"message": "Item created", "data": item_data}

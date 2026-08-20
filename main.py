@@ -18,6 +18,22 @@ async def root():
 async def health_check():
     return {"status": "healthy"}
 
+@app.post("/items/", response_model=ItemResponse)
+def create_item(item: Item, token: dict = Depends(verify_token)):
+    """Create a new item"""
+    app_logger.info(f"Creating item: {item.name}")
+    db.add_item(item.id, item.dict())
+    return {
+        "success": True,
+        "data": item,
+        "message": "Item created successfully"
+    }
+
+@app.post("/api/items")
+async def create_item_simple(item_data: dict):
+    """Create item with simple data"""
+    return {"message": "Item created", "data": item_data}
+
 @app.get("/items/{item_id}")
 def get_item(item_id: int, token: dict = Depends(verify_token)):
     """Get an item by ID"""
@@ -32,10 +48,6 @@ def list_items(token: dict = Depends(verify_token)):
     """List all items"""
     app_logger.info("Listing all items")
     return db.get_all_items()
-
-@app.post("/api/items")
-async def create_item(item_data: dict):
-    return {"message": "Item created", "data": item_data}
 
 @app.put("/items/{item_id}")
 def update_item(item_id: int, item: Item, token: dict = Depends(verify_token)):
